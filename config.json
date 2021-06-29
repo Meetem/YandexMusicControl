@@ -1,0 +1,5 @@
+{
+    "controlAddress": "127.0.0.1",
+    "controlPort": 40438,
+    "httpPort": 8812
+}

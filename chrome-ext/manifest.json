@@ -1,0 +1,24 @@
+{
+  "name": "Yandex.Music playback control",
+  "action": {},
+  "manifest_version": 3,
+  "version": "0.1",
+  "description": "Allows to control playback on Yandex.Music via TCP",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "tabCapture",
+    "scripting",
+    "background",
+    "idle",
+    "webRequest",
+    "alarms"
+  ],
+  "host_permissions": [
+    "http://localhost:8812/*",
+    "https://music.yandex.ru/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

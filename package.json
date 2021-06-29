@@ -1,0 +1,16 @@
+{
+  "name": "yandexmusiccontrol",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alex Bakanov",
+  "license": "ISC",
+  "dependencies": {
+    "async-foreach": "^0.1.3",
+    "split-string": "^6.1.0",
+    "string-format": "^2.0.0"
+  }
+}
