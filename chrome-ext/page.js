@@ -1,8 +1,58 @@
+$.fn.exists = function () {
+    return this.length !== 0;
+}
+
+class HomePagePlaylist{
+    constructor(shortName, friendlyName){
+        this.selector = `*[data-card=\"${shortName}\"]`;
+        this.available = false;
+        this.friendlyName = friendlyName;
+        this.name = shortName;
+        this.cover = null;
+    }
+
+    serialize(){
+        return {
+            available: this.available,
+            name: this.name,
+            friendlyName: this.friendlyName,
+            cover: this.cover
+        };
+    }
+
+    update(){
+        this.element = $(this.selector);
+        this.button = this.element?.find('button.button-play') || null;
+        this.cover = this.element?.find('img').attr('src') || null;
+        if(this.cover != null && this.cover.length > 0)
+            this.cover = 'https:' + this.cover;
+        else
+            this.cover = null;
+
+        if(this.button == null || !this.button.exists()){
+            this.available = false;
+            return;
+        }
+
+        this.available = true;
+    }
+
+    play(){
+        if(this.available !== true)
+            return false;
+
+        this.button.trigger('click');
+        return true;
+    }
+}
+
 console.log('Yandex.Music external control extension loaded');
 var pageLoaded = false;
 var timerId = undefined;
 var shouldSendUpdate = true;
 var prevIdx = -1;
+var playlists = [];
+var prevplaylistsJson = '';
 
 function getExternalApi(){
     return externalAPI;
@@ -15,7 +65,22 @@ function convertTrackInfo(yandexTrack) {
     return yandexTrack;
 }
 
+function updatePlaylists(){
+    playlists.forEach((v) => {
+        v.update()
+    });
+
+    const newPlaylists = JSON.stringify(playlists.map((v) => v.serialize()));
+    if(newPlaylists !== prevplaylistsJson){
+        shouldSendUpdate = true;
+    }
+
+    prevplaylistsJson = newPlaylists;
+}
+
 function sendGetInfo(sendPlaylist, sendResponse, force = false) {
+    updatePlaylists();
+
     if(force)
         shouldSendUpdate = true;
     
@@ -36,7 +101,8 @@ function sendGetInfo(sendPlaylist, sendResponse, force = false) {
         controls: controls,
         current: convertTrackInfo(getExternalApi().getCurrentTrack()),
         source: getExternalApi().getSourceInfo(),
-        playlist: playlist
+        playlist: playlist,
+        homePlaylists: playlists.map((v) => v.serialize())
     });
 
     shouldSendUpdate = false;
@@ -88,7 +154,31 @@ function onExtensionMessage(evt){
 
         shouldSendUpdate = true;
         sendResponse({ code: 0 });
-    } else if (msgStr == 'toggle-play') {
+    }else if(msgStr == 'set-playlist'){
+        const playlistName = detail.message.extra;
+        console.log('setting playlist', playlistName);
+
+        if(playlistName == 'radio'){
+            getExternalApi().play(-1);
+            shouldSendUpdate = true;
+            sendResponse({ code: 0 });
+            return;
+        }
+        
+        for(var i = 0;i<playlists.length;i++){
+            var pl = playlists[i];
+            if(pl == null || pl.name !== playlistName)
+                continue;
+
+            if(pl.available !== true){
+                sendResponse({ code: 1, message: 'playlist unavailable' });
+                return;
+            }
+
+            pl.play();
+            sendResponse({ code: 0, message: 'playlist unavailable' });
+        }
+    }else if (msgStr == 'toggle-play') {
         getExternalApi().togglePause();
         shouldSendUpdate = true;
         sendResponse({ code: 0 });
@@ -136,6 +226,11 @@ function onExtensionMessage(evt){
 
 function pageReady() {
     document.addEventListener('onExtensionMessage', onExtensionMessage);
+
+    playlists.push(new HomePagePlaylist('auto-playlist_of_the_day', 'Плейлист дня'))
+    playlists.push(new HomePagePlaylist('auto-never_heard', 'Дежавю'))
+    playlists.push(new HomePagePlaylist('auto-missed_likes', 'Тайник'))
+    updatePlaylists();
 
     pageLoaded = true;
     console.log('page ready, api loaded');

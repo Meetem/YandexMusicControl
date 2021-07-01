@@ -19,12 +19,27 @@ class ControlButton {
 
         if (v){
             this.btn.removeClass('disabled');
-            this.btn.css('display', '');
+            //this.btn.css('display', '');
         }
         else{
             this.btn.addClass('disabled');
+            //this.btn.css('display', 'none');
+        }
+    }
+
+    setVisible(v) {
+        this.visible = v;
+
+        if (v){
+            this.btn.css('display', '');
+        }
+        else{
             this.btn.css('display', 'none');
         }
+    }
+
+    isVisible(){
+        return this.visible;
     }
 
     isEnabled(){
@@ -45,6 +60,37 @@ class ControlButton {
     }
 }
 
+class PlaylistButton extends ControlButton{
+    constructor(element, playlistName){
+        super(element);
+        this.playlistName = playlistName;
+    }
+
+    clicked(){
+        super.clicked();
+        this.play();
+    }
+
+    updateWith(serializedData){
+        console.log(`updating playlist ${this.btn.selector} with `, serializedData);
+        if(serializedData == null || !serializedData.available){
+            this.setEnabled(false);
+            return;
+        }
+
+        this.btn.css('background-image', `url(\'${serializedData.cover}\')`);
+        this.setEnabled(true);
+    }
+
+    play(){
+        if(!this.isEnabled())
+            return false;
+        
+        setPlaylist(this.playlistName);
+        return true;
+    }
+}
+
 var buttons = {
     like: null,
     prev: null,
@@ -53,6 +99,8 @@ var buttons = {
     shuffle: null,
     radio: null
 };
+
+var playlistButtons = [];
 
 var trackInfo = {
     title: null,
@@ -87,6 +135,11 @@ function sendCommand(cmd, args){
         console.error(ex);
     });
 
+}
+
+function setPlaylist(playlistName){
+    console.log(`Requested playing ${playlistName}`);
+    sendCommand('set-playlist', {name: playlistName});
 }
 
 function nextClicked() {
@@ -153,7 +206,7 @@ function setupCover(track){
     }
 
     var link = 'https://' + track.album.cover;
-    link = link.replace('%%', '100x100');
+    link = link.replace('%%', '200x200');
     coverElement.attr('src', link);
 }
 
@@ -173,6 +226,28 @@ function updatePlaybackData(playback) {
     console.log(playback);
 }
 
+function updatePlaylists(playback){
+    const playlists = playback.homePlaylists;
+
+    playlistButtons.forEach((btn) => {
+        if(playlists == null || playlists.length <= 0){
+            btn.setEnabled(false)
+            return;
+        }
+
+        const pl = playlists.find((v) => {
+            return v.name == btn.playlistName;
+        });
+
+        if(pl == null){
+            btn.updateWith(null);
+            return;
+        }
+
+        btn.updateWith(pl);
+    });
+}
+
 function handlePlaybackData(data) {
     lastPlaylistHash = data.payload.hash;
     if (data.payload.cached === true)
@@ -184,6 +259,7 @@ function handlePlaybackData(data) {
     }
 
     updatePlaybackData(playback);
+    updatePlaylists(playback);
 }
 
 function reloadData(forced) {
@@ -210,6 +286,10 @@ $(document).ready(() => {
     buttons.play = new ControlButton($('#play-btn'));
     buttons.shuffle = new ControlButton($('#shuffle-btn'));
     buttons.radio = new ControlButton($('#radio-btn'));
+
+    playlistButtons.push(new PlaylistButton($('#playlist-of-the-day-btn'), 'auto-playlist_of_the_day'));
+    playlistButtons.push(new PlaylistButton($('#playlist-dejavu-btn'), 'auto-never_heard'));
+    playlistButtons.push(new PlaylistButton($('#playlist-never-heard-btn'), 'auto-missed_likes'));
 
     buttons.like.onClicked = likeClicked;
     buttons.prev.onClicked = prevClicked;

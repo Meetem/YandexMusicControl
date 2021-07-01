@@ -37,7 +37,7 @@ function returnHttp(data, response){
 function setCurrentPlayback(playbackData){
     currentPlayback = playbackData;
     currentPlaybackHash = crypto.createHash('md5').update(JSON.stringify(playbackData)).digest('hex');
-    console.log(`Updated playback with`, currentPlayback, currentPlaybackHash);
+    //console.log(`Updated playback with`, currentPlayback, currentPlaybackHash);
 
     return {
         code: 0,
@@ -93,6 +93,8 @@ function handleApiRequest(apiUrl, response){
         addPostponedAction({action: func});
     }else if(func == 'play'){
         addPostponedAction({action: func, extra: params.get('id')});
+    }else if(func == 'set-playlist'){
+        addPostponedAction({action: func, extra: params.get('name')});
     }else if(func == 'toggle-play'){
         addPostponedAction({action: func});
     }else if(func == 'get-info'){
@@ -146,8 +148,6 @@ function handleExternalRequest(request, response) {
         
         try{
             url = decodeURIComponent(url).replace(/\/+/g, '/');
-            console.log(url);
-
             const stats = fs.statSync(url);
             if (stats.isFile()) {
                 const stream = new fs.ReadStream(url);
