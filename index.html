@@ -1,16 +1,66 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src http: https: unsafe-inline">
+  <meta name="viewport" content="user-scalable=no">
+
+  <title>Yandex.Music Remote Control</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="/css/main.css" />
+  <link href='https://unpkg.com/css.gg/icons/all.css' rel='stylesheet'>
+
+  <!-- fonts -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap');
+    </style>
+</head>
+
+<body>
+  <div class='content'>
+    <div class='control'>
+      <div class='control-entry'>
+        <div class='control-button' id='prev-btn'>
+          <div class='icon'><i class="gg-play-track-prev"></i></div>
+        </div>
+        <div class='track'>
+            <img id='track-cover' class='cover' />
+            <div class='track-name'>
+              <p id='track-title' class='title'></p>
+              <p id='track-author' class='author'>Not playing</p>
+            </div>
+
+          <div class='control-button inline-btn' id='like-btn'>
+            <div class='icon'>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                class='heart-icon'>
+                <path fill-rule="nonzero" clip-rule="evenodd"
+                  d="M12.0122 5.57169L10.9252 4.48469C8.77734 2.33681 5.29493 2.33681 3.14705 4.48469C0.999162 6.63258 0.999162 10.115 3.14705 12.2629L11.9859 21.1017L11.9877 21.0999L12.014 21.1262L20.8528 12.2874C23.0007 10.1395 23.0007 6.65711 20.8528 4.50923C18.705 2.36134 15.2226 2.36134 13.0747 4.50923L12.0122 5.57169ZM11.9877 18.2715L16.9239 13.3352L18.3747 11.9342L18.3762 11.9356L19.4386 10.8732C20.8055 9.50635 20.8055 7.29028 19.4386 5.92344C18.0718 4.55661 15.8557 4.55661 14.4889 5.92344L12.0133 8.39904L12.006 8.3918L12.005 8.39287L9.51101 5.89891C8.14417 4.53207 5.92809 4.53207 4.56126 5.89891C3.19442 7.26574 3.19442 9.48182 4.56126 10.8487L7.10068 13.3881L7.10248 13.3863L11.9877 18.2715Z"
+                  fill="currentColor" />
+              </svg>
+              </i>
+            </div>
+          </div>
+          
+          <div class='control-button inline-btn' id='play-btn'>
+            <div class='icon'><i class="gg-play-button"></i></div>
+          </div>
+        </div>
+        <div class='control-button' id='next-btn'>
+          <div class='icon'><i class="gg-play-track-next"></i></div>
+        </div>
+        <div class='control-button' id='shuffle-btn'>
+          <div class='icon-225'><i class="gg-remote"></i></div>
+        </div>
+        <div class='control-button' id='radio-btn'>
+          <div class='icon-175'><i class="gg-media-podcast"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src='js/control.js'></script>
+
+</body>
+
 </html>

@@ -1,0 +1,193 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background-color: rgb(25, 25, 25);
+    color: rgb(240, 240, 240);
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+}
+
+.music {
+    width: 100%;
+    height: 100px;
+    position: fixed;
+    top: 0px;
+}
+
+.music-entry{
+    width: 100%;
+    height: 100px;
+}
+
+.control-button{
+    width: 65px;
+    min-width: 65px;
+    height: 65px;
+    margin: 2px;
+    border: 0px solid;
+    background-color: rgb(45, 45, 45);
+    border-radius: 8px;
+    align-content: space-around;
+    justify-content: space-around;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: row;
+}
+
+.track{
+    width: 100%;
+    height: 90px;
+    margin: 5px;
+    border: 1px solid rgb(100, 100, 100);
+    background-color: rgb(45, 45, 45);
+    border-radius: 8px;
+    align-content: space-around;
+    justify-content: flex-start;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.track-name{
+    align-content: flex-start;
+    justify-content: space-evenly;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    overflow: hidden;
+    margin-left: 12px;
+}
+
+.track img.cover{
+    border: 0px;
+    border-radius: 5px;
+    width: 75px;
+    height: 75px;
+    padding:0px;
+    margin: 0px;
+    padding-left: 6px;
+}
+
+.track p.title{
+    font-weight: 400;
+    font-size: 180%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track p.author{
+    opacity: 0.85;
+    padding-top: 2px;
+    font-size: 150%;
+    font-weight: 100;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.control-button div.icon{
+    --ggs: 2.5;
+}
+
+.control-button.active{
+    background-color: rgb(255,219,77);
+    color: rgb(20, 20, 20);
+}
+
+.control-button:active{
+    background-color: rgb(255,219,77);
+    color: rgb(20, 20, 20);
+}
+
+.control-button.disabled{
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.control-entry{
+    display: flex;
+    flex-direction: row;
+    height: 100px;
+    flex-wrap: nowrap;
+    align-content: stretch;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.inline-btn{
+    background-color: rgba(0,0,0,0.1);
+    align-self: flex-end;
+    padding: 0px !important;
+    height: 90px;
+    margin: 0px;
+    border-left: 1px solid rgb(100, 100, 100);
+}
+
+#play-btn{
+    width: 65px !important;
+    min-width: 65px !important;
+    border-radius: 0px 8px 0px 0px !important;
+}
+
+#like-btn{
+    width: 60px !important;
+    min-width: 60px !important;
+    border-radius: 0px !important;
+    margin-left: auto !important;
+}
+
+.control-entry.left{
+    justify-content: flex-start;
+}
+
+.heart-icon{
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(calc(var(--ggs,1)/1.75));
+}
+
+.control {
+    padding: 8px;
+    background-color:rgb(45, 45, 45);
+    width: 100%;
+    height: 115px;
+    top: 0px;
+}
+
+.icon-175{
+    --ggs: 1.75;
+}
+
+.icon-225{
+    --ggs: 2.25;
+}
+
+#like-btn.active{
+    color: rgb(253, 55, 55) !important;
+}
+
+#like-btn:active{
+    color: rgb(253, 55, 55) !important;
+}
+
+#prev-btn div.icon{
+    left: -10px;position: relative;
+}
+
+#next-btn div.icon{
+    left: 10px;position: relative;
+}

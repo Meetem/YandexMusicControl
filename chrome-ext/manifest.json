@@ -3,7 +3,7 @@
   "action": {},
   "manifest_version": 3,
   "version": "0.1",
-  "description": "Allows to control playback on Yandex.Music via TCP",
+  "description": "Allows to control playback on Yandex.Music via HTTP",
   "permissions": [
     "activeTab",
     "tabs",
@@ -20,5 +20,19 @@
   ],
   "background": {
     "service_worker": "background.js"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://music.yandex.ru/*"
+      ],
+      "js": ["page_inject.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["page.js"],
+      "matches": [ "https://music.yandex.ru/*" ]
+    }
+  ]
 }
