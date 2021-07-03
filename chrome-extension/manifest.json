@@ -31,7 +31,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["page.js"],
+      "resources": ["page.js", "HomePagePlaylist.js", "ExtensionCommunication.js"],
       "matches": [ "https://music.yandex.ru/*" ]
     }
   ]

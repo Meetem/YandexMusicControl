@@ -4,13 +4,15 @@
   "description": "",
   "main": "scripts/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "main": "node scripts/index.js"
   },
   "author": "Alex Bakanov",
   "license": "ISC",
   "dependencies": {
     "async-foreach": "^0.1.3",
     "css.gg": "^2.0.0",
+    "single-instance": "0.0.1",
     "split-string": "^6.1.0",
     "string-format": "^2.0.0"
   }

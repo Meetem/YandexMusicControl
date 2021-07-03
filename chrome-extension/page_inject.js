@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         detail: {
             message: message,
             sender: sender,
-            sendResponse: idNumber.toString()
+            messageId: idNumber.toString()
         }
     });
     
@@ -35,7 +35,7 @@ document.addEventListener('onWriteMessageAnswer', event => {
 document.addEventListener('readystatechange', event => {
     if (event.target.readyState === "complete") {
         const script = document.createElement("script");
-        script.type = 'text/javascript';
+        script.type = 'module';
         script.src = scriptUrl;
         document.documentElement.appendChild(script);
         injected = true;

@@ -2,49 +2,10 @@ $.fn.exists = function () {
     return this.length !== 0;
 }
 
-class HomePagePlaylist{
-    constructor(shortName, friendlyName){
-        this.selector = `*[data-card=\"${shortName}\"]`;
-        this.available = false;
-        this.friendlyName = friendlyName;
-        this.name = shortName;
-        this.cover = null;
-    }
+import HomePagePlaylist from './HomePagePlaylist.js'
+import ExtCommunication from './ExtensionCommunication.js'
 
-    serialize(){
-        return {
-            available: this.available,
-            name: this.name,
-            friendlyName: this.friendlyName,
-            cover: this.cover
-        };
-    }
-
-    update(){
-        this.element = $(this.selector);
-        this.button = this.element?.find('button.button-play') || null;
-        this.cover = this.element?.find('img').attr('src') || null;
-        if(this.cover != null && this.cover.length > 0)
-            this.cover = 'https:' + this.cover;
-        else
-            this.cover = null;
-
-        if(this.button == null || !this.button.exists()){
-            this.available = false;
-            return;
-        }
-
-        this.available = true;
-    }
-
-    play(){
-        if(this.available !== true)
-            return false;
-
-        this.button.trigger('click');
-        return true;
-    }
-}
+const communication = new ExtCommunication(handleMessage);
 
 console.log('Yandex.Music external control extension loaded');
 var pageLoaded = false;
@@ -108,41 +69,21 @@ function sendGetInfo(sendPlaylist, sendResponse, force = false) {
     shouldSendUpdate = false;
 }
 
-function onExtensionMessage(evt){
-    const detail = evt.detail;
-    const message = detail.message.type;
-    
-    var sendResponse = (reponseObject) => {
-        const event = new CustomEvent("onWriteMessageAnswer", {
-            detail: {
-                response: reponseObject,
-                sendResponse: detail.sendResponse
-            }
-        });
-
-        document.dispatchEvent(event);
-    }
-
-    if (!pageLoaded) {
-        console.log('page not loaded');
-        sendResponse({ code: -1 });
-        return;
-    }
-
+function handleMessage(message, sendResponse, sender){
     var controls = getExternalApi().getControls();
     var trackIdx = getExternalApi().getCurrentTrack();
     if (prevIdx != trackIdx) {
         shouldSendUpdate = true;
     }
 
-    const msgStr = message.toString();
+    const msgStr = message.type.toString();
     console.log(`got message: ${msgStr}`);
     if (msgStr === 'play-pause') {
         getExternalApi().togglePause();
         shouldSendUpdate = true;
         sendResponse({ code: 0 });
     } else if (msgStr == 'play') {
-        var extraId = detail.message.extra;
+        var extraId = message.extra;
         if(extraId !== undefined && typeof(extraId) === 'string')
             extraId = parseInt(extraId);
 
@@ -155,7 +96,7 @@ function onExtensionMessage(evt){
         shouldSendUpdate = true;
         sendResponse({ code: 0 });
     }else if(msgStr == 'set-playlist'){
-        const playlistName = detail.message.extra;
+        const playlistName = message.extra;
         console.log('setting playlist', playlistName);
 
         if(playlistName == 'radio'){
@@ -225,14 +166,13 @@ function onExtensionMessage(evt){
 };
 
 function pageReady() {
-    document.addEventListener('onExtensionMessage', onExtensionMessage);
-
     playlists.push(new HomePagePlaylist('auto-playlist_of_the_day', 'Плейлист дня'))
     playlists.push(new HomePagePlaylist('auto-never_heard', 'Дежавю'))
     playlists.push(new HomePagePlaylist('auto-missed_likes', 'Тайник'))
     updatePlaylists();
-
+    
     pageLoaded = true;
+    communication.initialize();
     console.log('page ready, api loaded');
 }
 
