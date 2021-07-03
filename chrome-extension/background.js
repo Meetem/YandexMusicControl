@@ -104,7 +104,7 @@ function requestActions() {
       return;
     }
 
-    console.log(response.message);
+    //console.log(response.message);
     handleActions(response.message);
   });
 }
@@ -144,11 +144,11 @@ function loop() {
 
 chrome.alarms.clear();
 
-for (var i = 0; i < 60; i++) {
+for (var i = 0; i < 100; i++) {
   chrome.alarms.clear(alarmName + ' - ' + i)
   chrome.alarms.create(alarmName + ' - ' + i, {
     periodInMinutes: 1,
-    when: Date.now() + (i * 1000)
+    when: Date.now() + (i * 600)
   });
 }
 

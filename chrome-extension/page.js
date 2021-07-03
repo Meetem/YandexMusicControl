@@ -166,6 +166,8 @@ function handleMessage(message, sendResponse, sender){
 };
 
 function pageReady() {
+    getExternalApi().navigate('home');
+    
     playlists.push(new HomePagePlaylist('auto-playlist_of_the_day', 'Плейлист дня'))
     playlists.push(new HomePagePlaylist('auto-never_heard', 'Дежавю'))
     playlists.push(new HomePagePlaylist('auto-missed_likes', 'Тайник'))

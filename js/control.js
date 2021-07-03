@@ -1,95 +1,9 @@
-class ControlButton {
-    constructor(jqueryBtn) {
-        this.btn = jqueryBtn;
-        const _this = this;
+import ItemUtils from './ItemUtils.js';
+import ControlButton from './ControlButton.js'
+import PlaylistButton from './PlaylistButton.js'
+import Playlist from './Playlist.js';
 
-        this.btn.on('click', () => _this.clicked());
-        this.active = false;
-        this.enabled = true;
-    }
-
-    clicked() {
-        if (this.onClicked != null && typeof (this.onClicked) === 'function') {
-            this.onClicked();
-        }
-    }
-
-    setEnabled(v) {
-        this.enabled = v;
-
-        if (v){
-            this.btn.removeClass('disabled');
-            //this.btn.css('display', '');
-        }
-        else{
-            this.btn.addClass('disabled');
-            //this.btn.css('display', 'none');
-        }
-    }
-
-    setVisible(v) {
-        this.visible = v;
-
-        if (v){
-            this.btn.css('display', '');
-        }
-        else{
-            this.btn.css('display', 'none');
-        }
-    }
-
-    isVisible(){
-        return this.visible;
-    }
-
-    isEnabled(){
-        return this.enabled;
-    }
-
-    isActive(){
-        return this.active;
-    }
-
-    setActive(v){
-        this.active = v;
-
-        if(v)
-            this.btn.addClass('active');
-        else
-            this.btn.removeClass('active');
-    }
-}
-
-class PlaylistButton extends ControlButton{
-    constructor(element, playlistName){
-        super(element);
-        this.playlistName = playlistName;
-    }
-
-    clicked(){
-        super.clicked();
-        this.play();
-    }
-
-    updateWith(serializedData){
-        console.log(`updating playlist ${this.btn.selector} with `, serializedData);
-        if(serializedData == null || !serializedData.available){
-            this.setEnabled(false);
-            return;
-        }
-
-        this.btn.css('background-image', `url(\'${serializedData.cover}\')`);
-        this.setEnabled(true);
-    }
-
-    play(){
-        if(!this.isEnabled())
-            return false;
-        
-        setPlaylist(this.playlistName);
-        return true;
-    }
-}
+var playlist = new Playlist(null, null);
 
 var buttons = {
     like: null,
@@ -171,8 +85,13 @@ function shuffleClicked() {
 
 function radioClicked(){
     console.log('radio');
-    sendCommand('play', {id: -1});
+    sendCommand('play-radio', {id: -1});
     buttons.radio.setActive(buttons.radio.isActive() != true);
+}
+
+function playlistItemSelected(item){
+    console.log('selected playlist item', item.data.id);
+    sendCommand('play', {id: item.data.id});
 }
 
 function setupControls(controls) {
@@ -188,13 +107,6 @@ function setupControls(controls) {
 
     buttons.radio.setActive(controls.prev === null);
     buttons.shuffle.setActive(controls.shuffle === true);
-}
-
-function getAuthor(authorsList){
-    if(authorsList == null || !Array.isArray(authorsList) || authorsList.length <= 0)
-        return 'Empty';
-
-    return authorsList.map((v) => v.title).join(', ');
 }
 
 function setupCover(track){
@@ -213,17 +125,23 @@ function setupCover(track){
 function setupCurrentTrack(track){
     currentPlaybackData = track;
     trackInfo.title.text(track?.title || '');
-    trackInfo.author.text(getAuthor(track?.artists || null));
+    trackInfo.author.text(ItemUtils.getCombinedArtistName(track?.artists || null));
     buttons.like.setActive(track.liked === true);
 
     setupCover(track);
 }
 
-function updatePlaybackData(playback) {
+function updatePlaybackData(playback, hash) {
     const controls = playback.controls;
     setupControls(controls);
     setupCurrentTrack(playback.current);
     console.log(playback);
+
+    if(controls.index !== true){
+        playlist.clear();
+    }else{
+        playlist.setItems(playback.playlist, playback.idx, hash);
+    }
 }
 
 function updatePlaylists(playback){
@@ -258,7 +176,7 @@ function handlePlaybackData(data) {
         return;
     }
 
-    updatePlaybackData(playback);
+    updatePlaybackData(playback, data.payload.hash);
     updatePlaylists(playback);
 }
 
@@ -291,6 +209,8 @@ $(document).ready(() => {
     playlistButtons.push(new PlaylistButton($('#playlist-dejavu-btn'), 'auto-never_heard'));
     playlistButtons.push(new PlaylistButton($('#playlist-never-heard-btn'), 'auto-missed_likes'));
 
+    playlistButtons.forEach((p) => p.setPlaylist = setPlaylist);
+    
     buttons.like.onClicked = likeClicked;
     buttons.prev.onClicked = prevClicked;
     buttons.next.onClicked = nextClicked;
@@ -305,4 +225,9 @@ $(document).ready(() => {
 
     reloadData(true);
     setInterval(() => reloadData(false), 250);
+
+    let playlistPrefab = $('#playlist-entry-prefab');
+    let playlistRoot = $('.playlist');
+    playlist.setup(playlistPrefab, playlistRoot);
+    playlist.onSelected = playlistItemSelected;
 });

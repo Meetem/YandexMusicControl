@@ -19,6 +19,20 @@
 
 <body ontouchstart="">
   <div class='content'>
+    <div class='playlist-root'>
+    <div class='playlist'>
+      <div class='music-entry prefab' id='playlist-entry-prefab' data-playlist-index='0'>
+        <img class='cover' src='https://avatars.yandex.net/get-music-content/4387391/34b4ce96.a.15695472-2/200x200'/>
+        <div class='track-name'>
+          <p class='title'>Title</p>
+          <p class='author'>Author</p>
+        </div>
+        <div class='control-button inline-btn play-btn'>
+          <div class='icon'><i class="gg-play-button"></i></div>
+        </div>
+      </div>
+    </div>
+    </div>
     <div class='control'>
       <div class='control-entry'>
         <div class='track'>
@@ -27,7 +41,7 @@
               <p id='track-title' class='title'></p>
               <p id='track-author' class='author'>Not playing</p>
             </div>
-          <div class='control-button inline-btn' id='play-btn'>
+          <div class='control-button inline-btn play-btn' id='play-btn'>
             <div class='icon'><i class="gg-play-button"></i></div>
           </div>
         </div>
@@ -53,9 +67,11 @@
         <div class='control-button' id='shuffle-btn'>
           <div class='icon-225'><i class="gg-remote"></i></div>
         </div>
+        <!--
         <div class='control-button' id='radio-btn'>
           <div class='icon-175'><i class="gg-media-podcast"></i></div>
         </div>
+        -->
         <div class='control-button playlist-button' id='playlist-of-the-day-btn'>
           
         </div>
@@ -68,8 +84,7 @@
       </div>
     </div>
   </div>
-  <script src='js/control.js'></script>
-
+  <script src='js/control.js' type='module'></script>
 </body>
 
 </html>

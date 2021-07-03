@@ -6,6 +6,8 @@ const JsonHttpServer = require('./JsonHttpServer');
 const crypto = require('crypto')
 var SingleInstance = require('single-instance');
 const { exit } = require('process');
+const mime = require('mime-type/with-db')
+
 var locker = new SingleInstance('yandex-music-control-server');
 
 locker.lock().then(() => {
@@ -148,21 +150,33 @@ function main(){
             return;
         }
     
-        let url = request.url;
-        if (!url.startsWith('/api/') && !url.startsWith('/scripts/')) {
-            if(url == '/'){
-                url = 'index.html';
-            }else if(url.startsWith('./')){
-                url = url.substr(2);
-            } else if(url[0] == '/'){
-                url = url.substr(1);
+        let url = new URL('http://fakehost' + request.url);
+        let path = url.pathname;
+        let searchFull = path + url.search;
+        //console.log(searchFull);
+
+        //console.log(path);
+        if (!path.startsWith('/api/') && !path.startsWith('/scripts/')) {
+            if(path == '/'){
+                path = 'index.html';
+            }else if(path.startsWith('./')){
+                path = path.substr(2);
+            } else if(path[0] == '/'){
+                path = path.substr(1);
             }
             
             try{
-                url = decodeURIComponent(url).replace(/\/+/g, '/');
-                const stats = fs.statSync(url);
+                path = decodeURIComponent(path).replace(/\/+/g, '/');
+                const stats = fs.statSync(path);
                 if (stats.isFile()) {
-                    const stream = new fs.ReadStream(url);
+                    const stream = new fs.ReadStream(path);
+                    const mimeType = mime.lookup(path);
+                    //console.log(`Got mime ${mimeType} for ${path}`);
+
+                    if(mimeType !== false){
+                        headers['Content-Type'] = mimeType;
+                    }
+
                     response.writeHead(200, headers);
                     stream.on('open', () => {
                         stream.pipe(response)
@@ -171,12 +185,13 @@ function main(){
                     throw 'Not a file'
                 }
             }catch(ex){
+                //console.log(ex, 'not found', path);
                 response.writeHead(404);
                 response.end('Not found');  
             }
             
-        } else if (url.startsWith('/api/')) {
-            handleApiRequest(url.substr('/api/'.length), response);
+        } else if (searchFull.startsWith('/api/')) {
+            handleApiRequest(searchFull.substr('/api/'.length), response);
         }else{
             response.statusCode = 404;
             response.end('Not found');
